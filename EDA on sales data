@@ -1,0 +1,93 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load dataset
+df = pd.read_csv("Online Sales Data.csv")
+
+# Basic Info
+print("\n--- Basic Info ---")
+print(df.info())
+print("\n--- First 5 Rows ---")
+print(df.head())
+print("\n--- Shape of Data ---")
+print(df.shape)
+
+# Convert Date column to datetime
+df['Date'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
+
+# Summary Statistics
+print("\n--- Summary Statistics ---")
+print(df.describe(include="all"))
+
+# Missing Values
+print("\n--- Missing Values ---")
+print(df.isnull().sum())
+
+# Duplicate Values
+print("\n--- Duplicate Values ---")
+print(df.duplicated().sum())
+
+# Sales Trend Over Time
+plt.figure(figsize=(12,6))
+sales_trend = df.groupby('Date')['Total Revenue'].sum()
+sales_trend.plot()
+plt.title("Sales Trend Over Time")
+plt.xlabel("Date")
+plt.ylabel("Total Revenue")
+plt.grid(True)
+plt.show()
+
+# Revenue by Product Category
+plt.figure(figsize=(10,6))
+sns.barplot(data=df, x='Product Category', y='Total Revenue', estimator=sum, ci=None)
+plt.title("Revenue by Product Category")
+plt.xticks(rotation=45)
+plt.show()
+
+# Revenue by Region
+plt.figure(figsize=(8,6))
+sns.barplot(data=df, x='Region', y='Total Revenue', estimator=sum, ci=None)
+plt.title("Revenue by Region")
+plt.show()
+
+# Payment Method Distribution
+plt.figure(figsize=(6,6))
+df['Payment Method'].value_counts().plot.pie(autopct='%1.1f%%', startangle=90)
+plt.title("Payment Method Distribution")
+plt.ylabel("")
+plt.show()
+
+# Units Sold Distribution
+plt.figure(figsize=(8,6))
+sns.histplot(df['Units Sold'], bins=20, kde=True)
+plt.title("Units Sold Distribution")
+plt.show()
+
+# Correlation Heatmap
+plt.figure(figsize=(8,6))
+sns.heatmap(df.corr(numeric_only=True), annot=True, cmap="coolwarm", fmt=".2f")
+plt.title("Correlation Heatmap")
+plt.show()
+
+# Top 10 Best-Selling Products
+plt.figure(figsize=(12,6))
+top_products = df.groupby('Product Name')['Total Revenue'].sum().sort_values(ascending=False).head(10)
+sns.barplot(x=top_products.values, y=top_products.index)
+plt.title("Top 10 Best-Selling Products by Revenue")
+plt.xlabel("Total Revenue")
+plt.ylabel("Product Name")
+plt.show()
+
+# Monthly Sales Analysis
+plt.figure(figsize=(12,6))
+df['Month'] = df['Date'].dt.to_period('M')
+monthly_sales = df.groupby('Month')['Total Revenue'].sum()
+monthly_sales.plot(kind='bar')
+plt.title("Monthly Sales Revenue")
+plt.xlabel("Month")
+plt.ylabel("Total Revenue")
+plt.show()
+
+print("\n--- EDA Completed Successfully ---")
